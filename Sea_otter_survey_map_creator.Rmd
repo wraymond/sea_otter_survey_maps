@@ -10,7 +10,7 @@ editor_options:
 # Map generator for sea otter surveys
 This script will make a map of where sea otter surveys should be conducted based on a point. All you will need is the Lat/Long of your site!
 
-```{r libraries}
+```{r libraries, echo = FALSE, message=FALSE, warning=FALSE}
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -25,16 +25,16 @@ library(DT)
 library(sf)
 ```
 
-```{r load data}
+```{r load data, echo = FALSE}
 ## Prince of Wales Water Polygon ##
-h2o.utm <- readOGR(dsn = "../ALL_DATA/spatial_data", layer = "POW_water_UTM")
+h2o.utm <- readOGR(dsn = "data", layer = "POW_water_UTM")
 h2o.latlong <- spTransform(h2o.utm, CRS("+init=epsg:4326"))
 ```
 
 ## Create survey area
 ### Where is your site?
 Input Lat/Long in decimal degrees below. Make sure that the site is "in the water"! Otherwise this wont work.
-```{r site}
+```{r site, echo=FALSE}
 site <- structure(list(id = "site", longitude = -132.899774, latitude = 55.192876), .Names = c("id", "longitude", "latitude"), class = "data.frame", row.names = c(NA, -1L))
 xy <- site[,c(2,3)]
 
@@ -46,7 +46,7 @@ site <- spTransform(site, CRS("+proj=utm +zone=8 +ellps=GRS80 +towgs84=0,0,0"))
 
 ### Make the polygon
 Some spatial math happens here. Its scary.
-```{r}
+```{r polygon, echo = FALSE}
 buff <- gBuffer(site, byid = TRUE, width = 3704, quadsegs = 10) # create buffer
 buff <- spTransform(buff, CRS("+init=epsg:4326")) # transform buffer
 buff.water <- gIntersection(h2o.latlong, buff, byid = TRUE) # clip the buffer area by water so we only have water area left
@@ -66,7 +66,7 @@ survey.poly.latlong <- spTransform(survey.poly, CRS("+init=epsg:4326"))
 ```
 
 ### Whats it look like?
-```{r make map}
+```{r make map, echo = FALSE}
 site.latlong <- spTransform(site, CRS("+init=epsg:4326"))
 leaflet() %>% 
   addProviderTiles(providers$Esri.WorldImagery) %>% 
